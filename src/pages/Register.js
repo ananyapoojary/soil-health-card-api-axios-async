@@ -28,6 +28,7 @@ const stateDistrictData = {
   Gujarat: ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
 };
 
+// Validation Schema
 const validationSchema = Yup.object({
   userType: Yup.string().required("User type is required"),
   fullName: Yup.string().min(3, "Name must be at least 3 characters").required("Full name is required"),
@@ -78,6 +79,10 @@ const Register = () => {
         boxShadow={6}
         borderRadius={3}
         bgcolor="rgba(255, 255, 230, 0.95)"
+        sx={{
+          transition: "transform 0.3s ease-in-out",
+          "&:hover": { transform: "scale(1.02)" },
+        }}
       >
         <Typography variant="h5" textAlign="center" fontWeight="bold">
           User Registration
@@ -118,8 +123,7 @@ const Register = () => {
           {/* District Selection (Dynamic) */}
           <FormControl fullWidth margin="normal">
             <InputLabel>District</InputLabel>
-            <Select name="district" value={formik.values.district} onChange={formik.handleChange}
-              disabled={!formik.values.state}>
+            <Select name="district" value={formik.values.district} onChange={formik.handleChange} disabled={!formik.values.state}>
               {(stateDistrictData[formik.values.state] || []).map((district) => (
                 <MenuItem key={district} value={district}>
                   {district}
@@ -181,12 +185,20 @@ const Register = () => {
             }}
           />
 
-          
-
-          {/* Submit Button */}
-          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+          {/* Register Button */}
+          <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }} disabled={!formik.isValid || !formik.dirty}>
             Register
           </Button>
+
+          {/* Navigation Buttons */}
+          <Grid container spacing={2} mt={2}>
+            <Grid item xs={6}>
+              <Button fullWidth variant="outlined" onClick={() => navigate("/login")}>Go to Login</Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button fullWidth variant="outlined" onClick={() => navigate("/")}>Back to Dashboard</Button>
+            </Grid>
+          </Grid>
         </form>
       </Box>
     </Container>
