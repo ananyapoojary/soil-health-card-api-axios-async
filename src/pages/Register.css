@@ -1,0 +1,65 @@
+/* Register Page Styling */
+.register-container {
+    background: linear-gradient(to right, #e3f2fd, #c8e6c9); /* Light blue to light green */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    animation: fadeIn 0.8s ease-in-out;
+  }
+  
+  .register-title {
+    font-size: 26px;
+    font-weight: bold;
+    color: #1b5e20; /* Dark green */
+    margin-bottom: 20px;
+  }
+  
+  .success-message {
+    margin-bottom: 15px;
+    background-color: #d9f99d; /* Light green */
+    color: #1b5e20;
+    font-weight: bold;
+  }
+  
+  /* Form Fields */
+  .MuiFormControl-root {
+    margin-bottom: 15px;
+  }
+  
+  /* Button Styling */
+  .register-button {
+    background-color: #1e88e5; /* Medium blue */
+    color: white;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .register-button:hover {
+    background-color: #1565c0; /* Darker blue */
+    transform: scale(1.05);
+  }
+  
+  .secondary-button {
+    background-color: #388e3c; /* Green */
+    color: white;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  .secondary-button:hover {
+    background-color: #2e7d32;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  

@@ -22,6 +22,7 @@ import { Visibility, VisibilityOff, PowerSettingsNewRounded } from "@mui/icons-m
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const validationSchema = Yup.object({
   userType: Yup.string().required("User type is required"),
@@ -32,9 +33,9 @@ const validationSchema = Yup.object({
 const Login = () => {
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const formik = useFormik({
     initialValues: {
@@ -50,17 +51,10 @@ const Login = () => {
         const response = await axios.post("https://jsonplaceholder.typicode.com/posts", values);
         console.log("Login Response:", response.data);
 
-        setMessage("✅ Successfully logged in!");
-        setIsLoggedIn(true);
-
-        if (rememberMe) {
-          localStorage.setItem("userEmail", values.email);
-        }
-
-        // Hide message after 3 seconds
+        setMessage("✅ Login successful! Redirecting...");
         setTimeout(() => {
-          setIsLoggedIn(false);
-        }, 3000);
+          navigate("/landing"); // Redirect to Landing.js
+        }, 2000);
       } catch (error) {
         setMessage("❌ Login failed. Please check your credentials.");
       } finally {
@@ -120,7 +114,7 @@ const Login = () => {
 
           {/* Success/Error Message */}
           {message && (
-            <Alert severity={isLoggedIn ? "success" : "error"} sx={{ my: 2, fontSize: "1rem", textAlign: "center" }}>
+            <Alert severity={message.includes("✅") ? "success" : "error"} sx={{ my: 2, fontSize: "1rem", textAlign: "center" }}>
               {message}
             </Alert>
           )}
