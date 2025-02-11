@@ -37,11 +37,11 @@ const UserMetricsTable = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><b>ID</b></TableCell>
-                <TableCell><b>Name</b></TableCell>
+                <TableCell><b>User ID</b></TableCell>
+                <TableCell><b>Full Name</b></TableCell>
                 <TableCell><b>Username</b></TableCell>
-                <TableCell><b>Email</b></TableCell>
-                <TableCell><b>City</b></TableCell>
+                <TableCell><b>Email Address</b></TableCell>
+                <TableCell><b>Location (City)</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
