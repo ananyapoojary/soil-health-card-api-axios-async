@@ -16,6 +16,10 @@ import {
   FormControl,
   MenuItem,
   Select,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
 import axios from "axios";
 import Header from "../components/Header";
@@ -27,6 +31,8 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage, setUsersPerPage] = useState(5);
   const [sortConfig, setSortConfig] = useState({ key: "id", direction: "asc" });
+  const [openDialog, setOpenDialog] = useState(false); // For modal visibility
+  const [selectedUser, setSelectedUser] = useState(null); // For storing selected user details
 
   // Fetch Data
   useEffect(() => {
@@ -76,6 +82,12 @@ const Dashboard = () => {
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  // Handle User Click
+  const handleUserClick = (user) => {
+    setSelectedUser(user); // Set selected user
+    setOpenDialog(true); // Open dialog
+  };
 
   return (
     <Container maxWidth="xl">
@@ -142,7 +154,7 @@ const Dashboard = () => {
               <TableBody>
                 {currentUsers.length > 0 ? (
                   currentUsers.map((user) => (
-                    <TableRow key={user.id} hover>
+                    <TableRow key={user.id} hover onClick={() => handleUserClick(user)}>
                       <TableCell>{user.id}</TableCell>
                       <TableCell>{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
@@ -182,6 +194,31 @@ const Dashboard = () => {
           Export CSV
         </Button>
       </Box>
+
+      {/* User Details Dialog */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>User Details</DialogTitle>
+        <DialogContent>
+          {selectedUser && (
+            <Box>
+              <Typography variant="h6">Full Name: {selectedUser.name}</Typography>
+              <Typography variant="body1">Email: {selectedUser.email}</Typography>
+              <Typography variant="body1">Phone: {selectedUser.phone}</Typography>
+              <Typography variant="body1">Website: {selectedUser.website}</Typography>
+              <Typography variant="body1">City: {selectedUser.address.city}</Typography>
+              <Typography variant="body1">Street: {selectedUser.address.street}</Typography>
+              <Typography variant="body1">Company: {selectedUser.company.name}</Typography>
+              <Typography variant="body1">Company Catchphrase: {selectedUser.company.catchPhrase}</Typography>
+              <Typography variant="body1">Company BS: {selectedUser.company.bs}</Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
