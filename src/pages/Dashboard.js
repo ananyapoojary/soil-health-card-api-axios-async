@@ -1,21 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { 
-  Box, Button, Container, Grid, Typography, Card, 
-  CardContent, CircularProgress, Table, TableBody, 
-  TableCell, TableContainer, TableHead, TableRow, Paper 
+import {
+  Box,
+  Button,
+  Container,
+  Typography,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TextField,
+  FormControl,
+  MenuItem,
+  Select,
 } from "@mui/material";
-import { motion } from "framer-motion";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 
 const Dashboard = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage, setUsersPerPage] = useState(5);
+  const [sortConfig, setSortConfig] = useState({ key: "id", direction: "asc" });
 
+  // Fetch Data
   useEffect(() => {
-    // Fetch User Metrics Data
     const fetchUsers = async () => {
       try {
         const response = await axios.get("https://jsonplaceholder.typicode.com/users");
@@ -26,175 +40,147 @@ const Dashboard = () => {
         setLoading(false);
       }
     };
+
     fetchUsers();
+    const interval = setInterval(fetchUsers, 30000); // Auto-refresh every 30 sec
+    return () => clearInterval(interval);
   }, []);
+
+  // Handle Sorting
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Sort Users
+  const sortedUsers = [...users].sort((a, b) => {
+    if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
+    if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // Filter Users
+  const filteredUsers = sortedUsers.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.address.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.id.toString().includes(searchQuery)
+  );
+
+  // Pagination Logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
 
   return (
     <Container maxWidth="xl">
-      {/* Reusable Header */}
       <Header />
 
       {/* Hero Section */}
-      <Box textAlign="center" mt={4} px={2}>
-        <Typography 
-          variant="h3" 
-          fontWeight="bold" 
-          color="primary"
-          component={motion.div}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          🌱 Welcome to the Soil Health Dashboard
+      <Box textAlign="center" mt={4}>
+        <Typography variant="h3" fontWeight="bold" color="primary">
+          🌱 Soil Health Dashboard
         </Typography>
         <Typography variant="h6" color="textSecondary" mt={2}>
           Manage Soil Health Reports & User Insights
         </Typography>
-        <Box mt={3}>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            sx={{ mr: 2 }} 
-            onClick={() => navigate("/login")}
-            component={motion.button}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            🔐 Login
-          </Button>
-          <Button 
-            variant="contained" 
-            color="secondary" 
-            onClick={() => navigate("/register")}
-            component={motion.button}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            📝 Register
-          </Button>
-        </Box>
       </Box>
 
-      {/* Interactive Cards */}
-      <Grid container spacing={4} mt={6}>
-        {[
-          {
-            title: "Total Farmers",
-            value: users.length,
-            description: "Registered Users in the System",
-            color: "#4CAF50",
-          },
-          {
-            title: "Pending Reports",
-            value: "18",
-            description: "Soil health reports awaiting approval",
-            color: "#FFC107",
-          },
-          {
-            title: "Active Soil Tests",
-            value: "45",
-            description: "Ongoing soil analysis processes",
-            color: "#2196F3",
-          },
-        ].map((card, index) => (
-          <Grid item xs={12} md={4} key={index}>
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <Card sx={{ boxShadow: 3, textAlign: "center", p: 3, backgroundColor: card.color, color: "white" }}>
-                <CardContent>
-                  <Typography variant="h5" fontWeight="bold">
-                    {card.title}
-                  </Typography>
-                  <Typography variant="h4" fontWeight="bold">
-                    {card.value}
-                  </Typography>
-                  <Typography variant="body1" mt={2}>
-                    {card.description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </Grid>
-        ))}
-      </Grid>
+      {/* Search and Filters */}
+      <Box display="flex" justifyContent="space-between" mt={4}>
+        <TextField
+          label="Search Users"
+          variant="outlined"
+          size="small"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{ width: 300 }}
+        />
+
+        {/* Page Size Selection */}
+        <FormControl sx={{ minWidth: 120 }}>
+          <Select value={usersPerPage} onChange={(e) => setUsersPerPage(e.target.value)}>
+            {[5, 10, 15, 20].map((size) => (
+              <MenuItem key={size} value={size}>
+                {size} per page
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
 
       {/* User Metrics Table */}
-      <Box mt={6}>
-        <Typography 
-          variant="h4" 
-          fontWeight="bold" 
-          color="primary" 
-          textAlign="center" 
-          mb={3}
-          component={motion.div}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          📊 User Metrics
-        </Typography>
+      <Box mt={4}>
         {loading ? (
           <Box textAlign="center">
             <CircularProgress />
           </Box>
         ) : (
-          <TableContainer 
-            component={Paper} 
-            sx={{ 
-              maxHeight: 400, 
-              borderRadius: "10px", 
-              boxShadow: 3, 
-              overflow: "hidden",
-              marginBottom: 4
-            }}
-          >
-            <Table stickyHeader>
-              {/* Table Header */}
+          <TableContainer component={Paper} sx={{ borderRadius: "10px", boxShadow: 3 }}>
+            <Table>
               <TableHead>
-                <TableRow sx={{ backgroundColor: "#1565C0" }}>
-                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textTransform: "uppercase" }}>
-                    User ID
-                  </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textTransform: "uppercase" }}>
-                    Full Name
-                  </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textTransform: "uppercase" }}>
-                    Email Address
-                  </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textTransform: "uppercase" }}>
-                    City
-                  </TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold", fontSize: "16px", textTransform: "uppercase" }}>
-                    Company
-                  </TableCell>
+                <TableRow sx={{ backgroundColor: "#1595C0" }}>
+                  {["User ID", "Full Name", "Email", "City", "Company"].map((header, index) => (
+                    <TableCell
+                      key={index}
+                      sx={{ fontWeight: "bold", cursor: "pointer" }}
+                      onClick={() => handleSort(header.replace(" ", "").toLowerCase())}
+                    >
+                      {header}
+                      {sortConfig.key === header.replace(" ", "").toLowerCase() &&
+                        (sortConfig.direction === "asc" ? " 🔼" : " 🔽")}
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
 
-
-              {/* Table Body */}
               <TableBody>
-                {users.map((user, index) => (
-                  <TableRow 
-                    key={user.id} 
-                    hover 
-                    component={motion.tr} 
-                    whileHover={{ scale: 1.02 }} 
-                    sx={{
-                      backgroundColor: index % 2 === 0 ? "#f5f5f5" : "white",
-                      transition: "background-color 0.3s",
-                      "&:hover": { backgroundColor: "#E3F2FD", boxShadow: 3 }
-                    }}
-                  >
-                    <TableCell sx={{ fontWeight: "bold", fontSize: "14px" }}>{user.id}</TableCell>
-                    <TableCell sx={{ fontSize: "14px", fontWeight: "500" }}>{user.name}</TableCell>
-                    <TableCell sx={{ fontSize: "14px", fontWeight: "500" }}>{user.email}</TableCell>
-                    <TableCell sx={{ fontSize: "14px", fontWeight: "500" }}>{user.address.city}</TableCell>
-                    <TableCell sx={{ fontSize: "14px", fontWeight: "500" }}>{user.company.name}</TableCell>
+                {currentUsers.length > 0 ? (
+                  currentUsers.map((user) => (
+                    <TableRow key={user.id} hover>
+                      <TableCell>{user.id}</TableCell>
+                      <TableCell>{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.address.city}</TableCell>
+                      <TableCell>{user.company.name}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      No users found
+                    </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </TableContainer>
         )}
+      </Box>
+
+      {/* Pagination Controls */}
+      <Box mt={3} textAlign="center">
+        <Button variant="contained" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)}>
+          ⬅️ Previous
+        </Button>
+        <Typography display="inline" mx={2}>
+          Page {currentPage}
+        </Typography>
+        <Button variant="contained" disabled={indexOfLastUser >= filteredUsers.length} onClick={() => setCurrentPage((prev) => prev + 1)}>
+          Next ➡️
+        </Button>
+      </Box>
+
+      {/* Export Data */}
+      <Box mt={3} textAlign="center">
+        <Button variant="contained" color="secondary" onClick={() => alert("CSV Download Placeholder")}>
+          Export CSV
+        </Button>
       </Box>
     </Container>
   );
