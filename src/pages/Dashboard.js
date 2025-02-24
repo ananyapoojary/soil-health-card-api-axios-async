@@ -20,7 +20,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Grid,
+  Divider,
 } from "@mui/material";
+import { Phone, Language, Home, Business } from "@mui/icons-material";
 import axios from "axios";
 import Header from "../components/Header";
 
@@ -188,33 +191,67 @@ const Dashboard = () => {
         </Button>
       </Box>
 
-      {/* Export Data */}
-      <Box mt={3} textAlign="center">
-        <Button variant="contained" color="secondary" onClick={() => alert("CSV Download Placeholder")}>
-          Export CSV
-        </Button>
-      </Box>
 
       {/* User Details Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>User Details</DialogTitle>
+        <DialogTitle
+          sx={{
+            backgroundColor: "#1595C0",
+            color: "white",
+            fontWeight: "bold",
+            padding: "16px",
+            textAlign: "center",
+          }}
+        >
+          User Details
+        </DialogTitle>
         <DialogContent>
           {selectedUser && (
             <Box>
-              <Typography variant="h6">Full Name: {selectedUser.name}</Typography>
-              <Typography variant="body1">Email: {selectedUser.email}</Typography>
-              <Typography variant="body1">Phone: {selectedUser.phone}</Typography>
-              <Typography variant="body1">Website: {selectedUser.website}</Typography>
-              <Typography variant="body1">City: {selectedUser.address.city}</Typography>
-              <Typography variant="body1">Street: {selectedUser.address.street}</Typography>
-              <Typography variant="body1">Company: {selectedUser.company.name}</Typography>
-              <Typography variant="body1">Company Catchphrase: {selectedUser.company.catchPhrase}</Typography>
-              <Typography variant="body1">Company BS: {selectedUser.company.bs}</Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Typography variant="h6" color="primary">
+                    {selectedUser.name}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    <Phone sx={{ fontSize: 18, mr: 1 }} />
+                    Phone:
+                  </Typography>
+                  <Typography variant="body2">{selectedUser.phone}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    <Language sx={{ fontSize: 18, mr: 1 }} />
+                    Website:
+                  </Typography>
+                  <Typography variant="body2">{selectedUser.website}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    <Home sx={{ fontSize: 18, mr: 1 }} />
+                    Address:
+                  </Typography>
+                  <Typography variant="body2">{`${selectedUser.address.street}, ${selectedUser.address.city}`}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body1" fontWeight="bold">
+                    <Business sx={{ fontSize: 18, mr: 1 }} />
+                    Company:
+                  </Typography>
+                  <Typography variant="body2">{selectedUser.company.name}</Typography>
+                </Grid>
+              </Grid>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="body2" color="textSecondary">
+                Email: {selectedUser.email}
+              </Typography>
             </Box>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="primary">
+          <Button onClick={() => setOpenDialog(false)} color="primary" variant="contained">
             Close
           </Button>
         </DialogActions>
